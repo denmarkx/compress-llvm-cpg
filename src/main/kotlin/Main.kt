@@ -59,12 +59,11 @@ fun persist(
                 val node = builder.node()
                 val labels = node.labels.joinToString(":")
                 val props = sanitizeProperties(node.propertyList.associate { it.key to it.value }).toMutableMap()
-                // Following the regular id will break because they are negative numbers..? for some reason.
                 props["cpgId"] = node.id
 
                 // Run cypher for each node:
-                println(props);
-                tx.run("CREATE (n:$labels)")
+                val query = "CREATE (n:$labels) SET n = \$props"
+                tx.run(query, mapOf("props" to props))
             }
         }
     }
