@@ -69,7 +69,6 @@ fun main() {
 * This is only done because the Fraunhofer library doesn't really expose this directly
 * nor is there a proper way to convert the graph from the OGM builders back into the translation result.
 *
-* TODO: i use cpgId but this is incorrect and doesn't match what the original implementation had
 */
 fun persist(
     nodeBuilder: List<DefaultNodeBuilder>?,
@@ -115,6 +114,10 @@ fun persist(
                     "props" to props
                 ))
             }
+
+            // cpgId is no longer needed on nodes.
+            val result = tx.run("MATCH (n) REMOVE n.cpgId")
+            result.consume()
         }
     }
 }
