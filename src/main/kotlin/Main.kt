@@ -69,7 +69,6 @@ fun main() {
 * This is only done because the Fraunhofer library doesn't really expose this directly
 * nor is there a proper way to convert the graph from the OGM builders back into the translation result.
 *
-* TODO: odd space between the property "code" and the actual value (ex: code: " %1 = alloca ...")
 * TODO: i use cpgId but this is incorrect and doesn't match what the original implementation had
 */
 fun persist(
@@ -88,6 +87,9 @@ fun persist(
                 val labels = node.labels.joinToString(":")
                 val props = sanitizeProperties(node.propertyList.associate { it.key to it.value }).toMutableMap()
                 props["cpgId"] = node.id
+                if (props["code"] != null) {
+                    props["code"] = props["code"].toString().trimStart()
+                }
 
                 // Run cypher for each node:
                 val query = "CREATE (n:$labels) SET n = \$props"
