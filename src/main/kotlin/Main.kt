@@ -9,6 +9,21 @@ import org.neo4j.ogm.cypher.compiler.builders.node.DefaultRelationshipBuilder
 
 import java.io.File
 
+/* Excluded nodes */
+private val FILTERED_NODES = setOf(
+    "GlobalScope"
+)
+
+/* Excluded edges */
+private val FILTERED_EDGES = setOf(
+    "LANGUAGE"
+)
+
+/*
+* TODO: this can be a CLI similar to cpg-neo4j
+* doing something like this will probably be more preferred in terms of installation
+* since we don't actually have to build the entire cpg library
+*/
 fun main() {
     val file = File("main.ll");
 
@@ -36,10 +51,11 @@ fun main() {
 
     // Actually removing the LANGUAGE edge from within a pass is hell.
     var (nodes, edges) = application.translateCPGToOGMBuilders(result)
-    edges = edges?.filter { e -> e.type() != "LANGUAGE" }
+
+    edges = edges?.filter { e -> e.type() !in FILTERED_EDGES }
     nodes = nodes?.filter { n ->
         val node = n.node()
-        !node.labels.contains("GlobalScope")
+        node.labels.intersect(FILTERED_NODES.toSet()).isEmpty()
     }
 
     // Move into Neo4J.
