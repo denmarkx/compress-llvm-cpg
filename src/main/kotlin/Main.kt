@@ -80,6 +80,9 @@ fun persist(
     val driver = GraphDatabase.driver(uri, org.neo4j.driver.AuthTokens.basic(user, password))
     driver.session().use { session ->
         session.executeWrite { tx ->
+            // Clear before building:
+            tx.run("MATCH (n) DETACH DELETE n").consume()
+
             // Nodes from DefaultNodeBuilder
             nodeBuilder?.forEach { builder ->
                 val node = builder.node()
